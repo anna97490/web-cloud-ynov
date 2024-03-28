@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import React from 'react';
 import { signup } from './firebase/auth_signup_password'; 
+import { signin } from './firebase/auth_signin_password'; 
 
 export default function App() {
   const [email, onChangeEmail] = React.useState('');
@@ -24,6 +25,7 @@ export default function App() {
         secureTextEntry={true}
       ></TextInput>
       <Button title="Sign up" onPress={() => signup(email, password)}></Button>
+      <Button title="Sign In" onPress={() => signin(email, password)}></Button>
     </View>
   );
 }
