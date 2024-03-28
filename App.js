@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import React from 'react';
 import { signup } from './firebase/auth_signup_password'; 
 import { signin } from './firebase/auth_signin_password'; 
+import { signinGithub } from './firebase/auth_github_signin_popup';
 import Toast from 'react-native-root-toast';
 import { RootSiblingParent } from 'react-native-root-siblings';
 
@@ -80,6 +81,7 @@ export default function App() {
         ></TextInput>
         <Button title="Sign up" onPress={handleSignup}></Button>
         <Button title="Sign In" onPress={handleSignin}></Button>
+        <Button title="Sign in with Github" onPress={signinGithub}></Button>
       </View>
     </RootSiblingParent>
   );
