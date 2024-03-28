@@ -1,8 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import React from 'react';
 import { signup } from './firebase/auth_signup_password'; 
 import { signin } from './firebase/auth_signin_password'; 
+import Toast from 'react-native-root-toast';
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 export default function App() {
   const [email, onChangeEmail] = React.useState('');
@@ -28,72 +29,60 @@ export default function App() {
   const handleSignup = () => {
     if (checkEmail(email) && checkPassword(password)) {
       signup(email, password);
-      alert("User created successfully");
+      /*Toast.show('User created successfully', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });*/
+      alert('User created successfully');
+
+    } else {
+      /*Toast.show('Invalid email or password', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });*/
+      alert('Invalid email or password');
     }
-    else {
-      alert("Invalid email or password");
-    }
-  }
+  };
 
   const handleSignin = () => {
     if (checkEmail(email) && checkPassword(password)) {
       signin(email, password);
-      alert("Signin success");
+
+      /*Toast.show('User created successfully', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });*/
+      alert('Signin success');
+    } else {
+      /*Toast.show('Invalid email or password', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
+      });*/
+      alert('Invalid email or password');
     }
-    else {
-      alert("Invalid email or password");
-    }
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text>Email</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={text=>onChangeEmail(text)}
-        value={email}
-      ></TextInput>
-      <Text>Password</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={text=>onChangePassword(text)}
-        value={password}
-        secureTextEntry={true}
-      ></TextInput>
-      <Button title="Sign up" onPress={handleSignup}></Button>
-      <Button title="Sign In" onPress={handleSignin}></Button>
-    </View>
+    <RootSiblingParent>
+      <View style={styles.container}>
+        <Text>Email</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text=>onChangeEmail(text)}
+          value={email}
+        ></TextInput>
+        <Text>Password</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text=>onChangePassword(text)}
+          value={password}
+          secureTextEntry={true}
+        ></TextInput>
+        <Button title="Sign up" onPress={handleSignup}></Button>
+        <Button title="Sign In" onPress={handleSignin}></Button>
+      </View>
+    </RootSiblingParent>
   );
-
-    /*return (
-    <View style={styles.container}>
-      <Text>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        // Regex email
-        onChangeText={text => {
-          if (emailRegex.test(text)) {
-            onChangeEmail(text);
-          }
-        }}
-      ></TextInput>
-      <Text>Password</Text>
-      <TextInput
-        style={styles.input}
-         // Regex password
-         onChangeText={text => {
-          if (passwordRegex.test(text)) {
-            onChangePassword(text);
-          }
-        }}
-        value={password}
-        secureTextEntry={true}
-      ></TextInput>
-      <Button title="Sign up" onPress={() => signup(email, password)}></Button>
-      <Button title="Sign In" onPress={() => signin(email, password)}></Button>
-    </View>
-  );*/
 }
 
 const styles = StyleSheet.create({
