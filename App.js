@@ -3,12 +3,17 @@ import React from 'react';
 import { signup } from './firebase/auth_signup_password'; 
 import { signin } from './firebase/auth_signin_password'; 
 import { signinGithub } from './firebase/auth_github_signin_popup';
+import { loginWithPhoneNumber } from './firebase/auth_phone_signin';
+import { verifyCode } from './firebase/auth_phone_verify_code';
 import Toast from 'react-native-root-toast';
 import { RootSiblingParent } from 'react-native-root-siblings';
 
 export default function App() {
   const [email, onChangeEmail] = React.useState('');
   const [password, onChangePassword] = React.useState('');
+  const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [code, setCode] = React.useState('');
+
 
   // Regex email
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -26,6 +31,8 @@ export default function App() {
   const checkPassword = (password) => {
     return passwordRegex.test(password);
   };
+
+
 
   const handleSignup = () => {
     if (checkEmail(email) && checkPassword(password)) {
@@ -79,9 +86,24 @@ export default function App() {
           value={password}
           secureTextEntry={true}
         ></TextInput>
+          <div id="recaptcha-container"></div>
+          <TextInput
+            style={styles.input}
+            onChangeText={text=>setPhoneNumber(text)}
+            value={phoneNumber}
+            placeholder='Enter phone number here'
+          ></TextInput>
+          <TextInput
+            style={styles.input}
+            onChangeText={(e) => setCode(e)}
+            value={code}
+            placeholder='Enter code here'
+          ></TextInput>
         <Button title="Sign up" onPress={handleSignup}></Button>
         <Button title="Sign In" onPress={handleSignin}></Button>
         <Button title="Sign in with Github" onPress={signinGithub}></Button>
+        <Button title='Sign in with Phone Number' onPress={() => loginWithPhoneNumber(phoneNumber)}></Button>
+        <Button title="verify" onPress={verifyCode(code)}></Button>
       </View>
     </RootSiblingParent>
   );
