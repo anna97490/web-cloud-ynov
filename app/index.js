@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { getPostData } from "../firebase/get_post_data";
 
-export default function Home() {
+export default function App() {
   const [posts, setPosts] = useState([])
   useEffect(() => {
     const fetchData = async () => {
