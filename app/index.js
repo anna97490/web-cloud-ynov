@@ -1,32 +1,34 @@
 import React, {useState, useEffect} from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {Pressable, StyleSheet, Text, View} from "react-native";
+import { Link } from 'expo-router';
 import { getPostData } from "../firebase/get_post_data";
+import {router} from "expo-router";
 
-export default function App() {
-  const [posts, setPosts] = useState([])
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getPostData();
-      console.log(data);
-      setPosts(data);
-    }
-    fetchData();
-  }, [])
+export default function Home() {
+    const [posts, setPosts] = useState([]);
 
-  return (
-    <View style={styles.container}>
-      <Text>Bienvenue</Text>
-      <Link href="newpost">Créer un nouveau post</Link>
-      {posts.map((p) => {
-        return (
-          <View key={p.id} style={styles.item}>
-            <Text style={styles.itemTitle}>{p.title}</Text>
-            <Text>{p.text}</Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+    useEffect(() => {
+      const fetchData = async () => {
+          const data = await getPostData();
+          console.log(data);
+          setPosts(data);
+      }
+      fetchData();
+    }, [])
+
+    return (
+      <View style={styles.container}>
+        <Link href="newpost">Créer un nouveau post</Link>
+        {posts.map((p) => {
+          return (
+            <Pressable key={p.id} style={styles.item} onPress={()=>router.push(`post/${p.id}`)}>
+              <Text style={styles.itemTitle}>{p.title}</Text>
+              <Text>{p.text}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontWeight: "bold"
-  }, 
+  },
   input: {
     height: 40,
     width: 200,

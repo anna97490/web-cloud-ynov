@@ -9,6 +9,7 @@ import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 export default function Header() {
   const [user, setUser] = useState(null)
   const auth = getAuth();
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -26,8 +27,11 @@ export default function Header() {
   }, [])
 
   const logout = () => {
-    signOut(auth)
+    signOut(auth).then(() => {
+      router.push("signin");
+    });
   }
+
   return (
     <NavigationContainer independent={true}>
       <View style={styles.container}>
@@ -46,6 +50,7 @@ export default function Header() {
     </NavigationContainer>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     display: "flex",

@@ -3,9 +3,9 @@ import "../../firebaseConfig"
 import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { useLocalSearchParams } from 'expo-router';
 import { getOnePostData } from "../../firebase/get_one_post_data";
+
 export default function Post() {
   const [post, setPost] = useState(null)
-
   const local = useLocalSearchParams();
 
   useEffect(() => {

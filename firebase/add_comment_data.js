@@ -1,6 +1,7 @@
 import app from "../firebaseConfig";
 import { getFirestore } from "firebase/firestore";
 import { collection, addDoc } from "firebase/firestore";
+
 const db = getFirestore(app);
 
 export const createComment = async (text, createdBy, postRef) => {

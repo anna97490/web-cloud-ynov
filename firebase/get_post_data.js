@@ -1,6 +1,7 @@
 import app from "../firebaseConfig";
 import { getFirestore } from "firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
+
 const db = getFirestore(app);
 
 export const getPostData = async () => {

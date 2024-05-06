@@ -1,6 +1,7 @@
-import app from "../firebaseConfig";
+import "../firebaseConfig";
 import { getAuth, updateProfile } from "firebase/auth";
-const auth = getAuth(app);
+
+const auth = getAuth();
 
 export const updateUserPhotoUrl = async (downloardUrl) => {
     try {
