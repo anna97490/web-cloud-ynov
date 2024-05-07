@@ -10,5 +10,6 @@ export const uploadToFirebase = async (uri, name) => {
     const uploadTask = await uploadBytes(imageRef, theBlob);
 
     const downloadUrl = await getDownloadURL(uploadTask.ref);
+    
     return downloadUrl;
 };

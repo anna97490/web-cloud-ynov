@@ -4,103 +4,105 @@ import { signin } from "../../firebase/auth_signin_password";
 import { signinWithGithub } from "../../firebase/auth_github_signin_popup";
 import { loginWithPhoneNumber, verifyCode } from "../../firebase/auth_phone_signin";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useNavigation } from "@react-navigation/native";
+import {router} from "expo-router";
 
 export default function Signin() {
     const auth = getAuth();
-    const navigation = useNavigation();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("+");
-    const [code, setCode] = useState("");
+    const [email, onChangeEmail] = useState("");
+    const [password, onChangePassword] = useState("");
+    const [phoneNumber, onChangePhoneNumber] = useState("+");
+    const [code, onChangeCode] = useState("");
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                navigation.navigate("Profile");
+                router.push("profile");
             }
         });
-        return unsubscribe;  
-    }, []);
+    }, [])
+
+    const confirmEmail = (email) => {
+        const regex = /\S+@\S+\.\S+/;
+        return regex.test(email);
+    };
+
+    const confirmPassword = (password) => {
+        return password.length >= 6;
+    };
+
+    const confirmPhoneNumber = (phoneNumber) => {
+        const regex = /^\+[1-9]\d{1,14}$/;
+        return regex.test(phoneNumber);
+    }
+
+    const confirmForm = (email, password) => {
+        return confirmEmail(email) && confirmPassword(password);
+    }
 
     const handleSignin = async () => {
-        if (email.match(/\S+@\S+\.\S+/) && password.length >= 6) {
-            try {
-                await signin(email, password);
-                Alert.alert("Success", "User signed in successfully");
-            } catch (error) {
-                Alert.alert("Sign in failed", error.errorMessage);
-            }
+        if (confirmForm(email, password)) {
+            signin(email, password);
+            alert("User signed in successfully")
         } else {
-            Alert.alert("Validation Error", "Invalid email or password");
+            alert("Invalid email or password");
         }
-    };
+    }
 
     const handleSigninPhone = async () => {
-        if (phoneNumber.match(/^\+[1-9]\d{1,14}$/)) {
-            try {
-                await loginWithPhoneNumber(phoneNumber);
-            } catch (error) {
-                Alert.alert("Phone sign in failed", error.message);
-            }
+        if (confirmPhoneNumber(phoneNumber)) {
+            await loginWithPhoneNumber(phoneNumber);
         } else {
-            Alert.alert("Validation Error", "Invalid phone number");
+            alert("Invalid phone number");
         }
-    };
+    }
 
     const handlePhoneCode = async () => {
-        try {
-            await verifyCode(code);
-        } catch (error) {
-            Alert.alert("Code verification failed", error.message);
-        }
-    };
+        await verifyCode(code);
+    }
 
     return (
         <View style={styles.container}>
             <Text>Email</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={setEmail}
+                onChangeText={onChangeEmail}
                 value={email}
-                placeholder="Enter your email"
-            />
+            ></TextInput>
             <Text>Password</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={setPassword}
+                onChangeText={onChangePassword}
                 value={password}
                 secureTextEntry={true}
-                placeholder="Enter your password"
-            />
-            <Pressable onPress={handleSignin} style={styles.button}>
-                <Text style={styles.buttonLabel}>Sign In!</Text>
+            ></TextInput>
+            <Pressable onPress={handleSignin} style = {styles.button}>
+                <Text>Sign In!"</Text>
             </Pressable>
-            <Text>___GitHub___</Text>
-            <Pressable onPress={signinWithGithub} style={styles.button}>
-                <Text style={styles.buttonLabel}>Sign In with Github</Text>
+            <Text>____Github_____</Text>
+            <Pressable onPress={() => signinWithGithub()} style = {styles.button}>
+                <Text>Sign In with Github</Text>
             </Pressable>
-            <Text>___Phone___</Text>
+            <Text>____Phone_____</Text>
             <Text>Phone number</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={setPhoneNumber}
+                onChangeText={onChangePhoneNumber}
                 value={phoneNumber}
-                placeholder="Enter your phone number"
-            />
-            <Pressable onPress={handleSigninPhone} style={styles.button}>
-                <Text style={styles.buttonLabel}>Sign In with Phone</Text>
+            ></TextInput>
+            <Pressable id="sign-in-button-phone" onPress={handleSigninPhone} style = {styles.button}>
+                <Text>Sign In with Phone</Text>
             </Pressable>
+            <div id="recaptcha-container"></div>
             <Text>Code</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={setCode}
+                onChangeText={onChangeCode}
                 value={code}
-                placeholder="Verification code"
-            />
-            <Pressable onPress={handlePhoneCode} style={styles.button}>
-                <Text style={styles.buttonLabel}>Check Code!</Text>
+            ></TextInput>
+            <Pressable onPress={handlePhoneCode} style = {styles.button}>
+                <Text>Check Code !</Text>
             </Pressable>
+
         </View>
     );
 }

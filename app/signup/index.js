@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, Image, Pressable, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, {useEffect} from "react";
+import { StyleSheet, Text, View, TextInput, Image, Pressable } from "react-native";
 import { signup } from "../../firebase/auth_signup_password";
 import * as ImagePicker from "expo-image-picker";
-import { getAuth } from "firebase/auth";
-import { uploadToFirebase } from "../../firebase/storage_upload_file";
-import { updateProfileInfos } from "../../firebase/auth_update_infos";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
+import {router} from "expo-router";
+import {uploadToFirebase} from "../../firebase/storage_upload_file";
+import {updateProfileInfos} from "../../firebase/auth_update_infos";
 
 export default function Signup() {
     const auth = getAuth();
-    const navigation = useNavigation();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [username, setUsername] = useState("");
-    const [image, setImage] = useState(null);
+    const [email, onChangeEmail] = React.useState("");
+    const [password, onChangePassword] = React.useState("");
+    const [username, onChangeUsername] = React.useState("");
+    const [image, setImage] = React.useState(null);
+    const [fileName, setFileName] = React.useState("");
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,42 +25,72 @@ export default function Signup() {
 
         if (!result.canceled) {
             setImage(result.assets[0].uri);
+            const { uri } = result.assets[0];
+            setFileName(uri.split("/").pop());
         }
+    }
+
+    const confirmEmail = (email) => {
+        const regex = /\S+@\S+\.\S+/;
+        return regex.test(email);
     };
 
-    const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-    const validatePassword = (password) => password.length >= 6;
-    const validateUsername = (username) => /^[a-zA-Z0-9]+$/.test(username);
+    const confirmPassword = (password) => {
+        return password.length >= 6;
+    };
+
+    const confirmUsername = (username) => {
+        const regex = /^[a-zA-Z0-9]+$/;
+        return regex.test(username);
+    }
+
+    const confirmForm = (email, password) => {
+        return confirmEmail(email) && confirmPassword(password) && confirmUsername(username);
+    }
 
     const handleSignup = async () => {
-        if (validateEmail(email) && validatePassword(password) && validateUsername(username)) {
-            try {
-                await signup(email, password);
-                const fileName = image.split("/").pop();
-                const uploadResp = await uploadToFirebase(image, fileName);
-                await updateProfileInfos(uploadResp, username);
-                Alert.alert("Success", "User created successfully");
-                navigation.navigate("Profile");
-            } catch (error) {
-                Alert.alert("Error", error.message);
-            }
+        if (confirmForm(email, password)) {
+            await signup(email, password);
+
+            const uploadResp = await uploadToFirebase(image, fileName);
+
+            await updateProfileInfos(uploadResp, username);
+
+            alert("User created successfully")
+            router.push("profile");
         } else {
-            Alert.alert("Error", "Invalid email, password, or username");
+            alert("Invalid email or password");
         }
     };
 
     return (
         <View style={styles.container}>
-            <TextInput style={styles.input} onChangeText={setEmail} value={email} placeholder="Email" />
-            <TextInput style={styles.input} onChangeText={setPassword} value={password} secureTextEntry={true} placeholder="Password" />
-            <TextInput style={styles.input} onChangeText={setUsername} value={username} placeholder="Username" />
+            <Text>Email</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangeEmail}
+                value={email}
+            />
+            <Text>Password</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangePassword}
+                value={password}
+                secureTextEntry={true}
+            />
+            <Text>Username</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={onChangeUsername}
+                value={username}
+            />
             <Text>Profile picture (optional)</Text>
             <Pressable onPress={pickImage} style={styles.button}>
-                <Text style={styles.buttonLabel}>Choose Image</Text>
+                <Text>Choose Image</Text>
             </Pressable>
-            {image && <Image source={{ uri: image }} style={styles.image} />}
-            <Pressable onPress={handleSignup} style={styles.button}>
-                <Text style={styles.buttonLabel}>Sign Up!</Text>
+            {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+            <Pressable onPress={handleSignup} style = {styles.button}>
+                <Text>Sign Up!</Text>
             </Pressable>
         </View>
     );
@@ -71,33 +101,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff",
         alignItems: "center",
-        justifyContent: "center",
-        padding: 20
+        justifyContent: "center"
     },
     input: {
         height: 40,
-        width: '100%',
-        marginVertical: 8,
+        width: 200,
+        margin: 12,
         borderWidth: 1,
-        padding: 10,
-        borderRadius: 5
+        padding: 10
     },
     button: {
         backgroundColor: 'blue',
-        width: '100%',
-        padding: 10,
+        minWidth: 100,
+        minHeight: 50,
+        display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginVertical: 8,
-        borderRadius: 5
+        justifyContent: 'center'
     },
     buttonLabel: {
         color: 'white',
-        fontWeight: 'bold'
-    },
-    image: {
-        width: 200,
-        height: 200,
-        marginVertical: 8
+        fontWeight: 700
     }
 });

@@ -19,11 +19,11 @@ export default function Home() {
     return (
       <View style={styles.container}>
         <Link href="newpost">Créer un nouveau post</Link>
-        {posts.map((p) => {
+        {posts.map((post) => {
           return (
-            <Pressable key={p.id} style={styles.item} onPress={()=>router.push(`post/${p.id}`)}>
-              <Text style={styles.itemTitle}>{p.title}</Text>
-              <Text>{p.text}</Text>
+            <Pressable key={post.id} style={styles.item} onPress={()=>router.push(`post/${post.id}`)}>
+              <Text style={styles.itemTitle}>{post.title}</Text>
+              <Text>{post.text}</Text>
             </Pressable>
           );
         })}
